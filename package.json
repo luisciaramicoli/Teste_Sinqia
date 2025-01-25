@@ -1,0 +1,45 @@
+{
+  "name": "api_nodejs_2des_a_2sem_24",
+  "version": "1.0.0",
+  "description": "Api TCC",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ewertonjsilva/api_nodejs_2des_a_2sem_24.git"
+  },
+  "keywords": [
+    "API",
+    "NodeJS",
+    "MySQL"
+  ],
+  "author": "Ewerton",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ewertonjsilva/api_nodejs_2des_a_2sem_24/issues"
+  },
+  "homepage": "https://github.com/ewertonjsilva/api_nodejs_2des_a_2sem_24#readme",
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.4",
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
+    "bwip-js": "^4.5.1",
+    "cloudinary": "^2.5.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "dropbox": "^10.34.0",
+    "express": "^4.19.2",
+    "express-fileupload": "^1.5.1",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.10.0",
+    "node-cron": "^3.0.3",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
