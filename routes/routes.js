@@ -2,15 +2,26 @@ const express = require("express");
 const router = express.Router();
 
 // referência a controllers que serão utilizados nas rotas
-const ComprasController = require("../controllers/compras");
+const TurismoController = require('../controllers/turismo');  // Verifique o caminho correto
+const CadastroController = require('../controllers/usuarios');  // Verifique o caminho correto
+const LoginController = require('../controllers/login');  // Verifique o caminho correto
 
+// Listar todos os pontos turísticos
+router.get("/pontosTuristicos", TurismoController.listarPontosTuristicos);
 
-//Compras
-router.get("/compras", ComprasController.listarCompras);
-router.post("/compras", ComprasController.cadastrarCompra); //body
-router.patch("/compras/:comp_id", ComprasController.editarCompra); // params (URL) e body
-router.delete("/compras/:comp_id", ComprasController.apagarCompra); // params (URL)
+// Cadastrar um novo ponto turístico
+router.post("/cadastrarPonto", TurismoController.cadastrarPontoTuristico);
 
+// Editar um ponto turístico
+router.put("/pontosTuristicos/:ponto_id", TurismoController.editarPontoTuristico);
 
+// Apagar um ponto turístico
+router.delete("/pontosTuristicos/:ponto_id", TurismoController.apagarPontoTuristico);
+
+// Cadastrar um novo ponto usuario
+router.post("/cadastrarUsuario", CadastroController.cadastrarUsuario);
+
+// Cadastrar um novo ponto usuario
+router.post("/login", LoginController.login);
 
 module.exports = router;

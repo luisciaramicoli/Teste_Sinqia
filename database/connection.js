@@ -1,26 +1,35 @@
 const sql = require('mssql');
 
-// Configurações de conexão para SQL Server com autenticação do Windows
+// Configuração do banco de dados
 const config = {
-  user: '', // Deixe vazio, pois a autenticação do Windows será usada
-  password: '', // Deixe vazio também
-  server: 'localhost',  // 
-  database: 'pontos_turisticos_db', // O banco de dados que você deseja acessar
+  user: 'luis',
+  password: '123408',
+  server: 'localhost',
+  database: 'pontos_turisticos_db',
   options: {
-    encrypt: true, // Se necessário, use true para conexões seguras
-    trustServerCertificate: true, // Necessário para evitar erro com certificados em alguns casos
+    encrypt: true,
+    trustServerCertificate: true,
   },
-  trustedConnection: true // Habilita a autenticação do Windows
 };
 
-// Teste de conexão
-async function testConnection() {
+// Função para obter a conexão com o banco
+async function connect() {
   try {
-    const pool = await sql.connect(config);
-    console.log('Conexão bem-sucedida ao SQL Server com Autenticação do Windows!');
+    const pool = await sql.connect(config); // Conecta ao banco
+    return pool;
   } catch (err) {
     console.error('Erro ao conectar ao SQL Server:', err);
+    throw err;
   }
 }
 
-testConnection();
+// Função para fechar a conexão depois de terminar
+async function closeConnection(pool) {
+  try {
+    await pool.close();  // Fecha a conexão com o banco
+  } catch (err) {
+    console.error('Erro ao fechar a conexão:', err);
+  }
+}
+
+module.exports = { connect, closeConnection };
