@@ -159,44 +159,139 @@ async cadastrarPontoTuristico(request, response) {
   // Edita um ponto turístico
   async editarPontoTuristico(request, response) {
     let pool;
+    let transaction;
     try {
-      const { nome, descricao, localizacao, cidade, estado_id, data_inclusao } = request.body;
+      const { nome, descricao, localizacao, cidade, estado_id, data_inclusao, logradouro, bairro, cep } = request.body;
       const { ponto_id } = request.params;
-      pool = await connect();  // Obtemos a conexão
-
-      const query = `
-        UPDATE PontosTuristicos 
-        SET Nome = @nome, Descricao = @descricao, Localizacao = @localizacao, Cidade = @cidade, estado_id = @estado_id, data_inclusao = @data_inclusao
-        WHERE ponto_id = @ponto_id;
-      `;
-      
-      const result = await pool.request()
-        .input('nome', sql.NVarChar, nome)
-        .input('descricao', sql.NVarChar, descricao)
-        .input('localizacao', sql.NVarChar, localizacao)
-        .input('cidade', sql.NVarChar, cidade)
-        .input('estado_id', sql.Int, estado_id)
-        .input('data_inclusao', sql.Date, data_inclusao)
-        .input('ponto_id', sql.Int, ponto_id)
-        .query(query);
-
+  
+      if (!ponto_id || isNaN(ponto_id)) {
+        return response.status(400).json({
+          sucesso: false,
+          mensagem: 'ID do ponto turístico inválido.',
+        });
+      }
+  
+      pool = await connect(); // Obtemos a conexão
+      transaction = new sql.Transaction(pool);
+  
+      // Iniciar a transação
+      await transaction.begin();
+  
+      // Atualização para a tabela PontosTuristicos
+      let updatePontoQuery = 'UPDATE pontos_turisticos SET';
+      const pontoFields = [];
+      const pontoValues = {};
+  
+      if (nome) {
+        pontoFields.push('nome = @nome');
+        pontoValues.nome = nome;
+      }
+      if (descricao) {
+        pontoFields.push('descricao = @descricao');
+        pontoValues.descricao = descricao;
+      }
+      if (localizacao) {
+        pontoFields.push('localizacao = @localizacao');
+        pontoValues.localizacao = localizacao;
+      }
+      // Removemos a coluna 'cidade' de 'pontos_turisticos'
+      if (data_inclusao) {
+        pontoFields.push('data_inclusao = @data_inclusao');
+        pontoValues.data_inclusao = data_inclusao;
+      }
+  
+      if (pontoFields.length > 0) {
+        updatePontoQuery += ` ${pontoFields.join(', ')} WHERE ponto_id = @ponto_id;`;
+        console.log('Query PontosTuristicos:', updatePontoQuery); // Log
+        const requestPontos = transaction.request();
+        Object.entries(pontoValues).forEach(([key, value]) => {
+          requestPontos.input(key, key === 'data_inclusao' ? sql.Date : sql.NVarChar, value);
+        });
+        requestPontos.input('ponto_id', sql.Int, ponto_id);
+        await requestPontos.query(updatePontoQuery);
+      }
+  
+      // Atualização para a tabela Enderecos
+      let updateEnderecoQuery = 'UPDATE endereco SET';
+      const enderecoFields = [];
+      const enderecoValues = {};
+  
+      if (logradouro) {
+        enderecoFields.push('logradouro = @logradouro');
+        enderecoValues.logradouro = logradouro;
+      }
+      if (bairro) {
+        enderecoFields.push('bairro = @bairro');
+        enderecoValues.bairro = bairro;
+      }
+      if (estado_id) {
+        enderecoFields.push('estado_id = @estado_id');
+        enderecoValues.estado_id = estado_id;
+      }
+      if (cep) {
+        enderecoFields.push('cep = @cep');
+        enderecoValues.cep = cep;
+      }
+      if (cidade) { // A cidade agora é atualizada corretamente na tabela 'endereco'.
+        enderecoFields.push('cidade = @cidade');
+        enderecoValues.cidade = cidade;
+      }
+  
+      if (enderecoFields.length > 0) {
+        updateEnderecoQuery += ` ${enderecoFields.join(', ')} WHERE end_id = (SELECT end_id FROM pontos_turisticos WHERE ponto_id = @ponto_id);`;
+        console.log('Query Enderecos:', updateEnderecoQuery); // Log
+        const requestEnderecos = transaction.request();
+        Object.entries(enderecoValues).forEach(([key, value]) => {
+          requestEnderecos.input(key, sql.NVarChar, value);
+        });
+        requestEnderecos.input('ponto_id', sql.Int, ponto_id);
+        await requestEnderecos.query(updateEnderecoQuery);
+      }
+  
+      if (pontoFields.length === 0 && enderecoFields.length === 0) {
+        return response.status(400).json({
+          sucesso: false,
+          mensagem: 'Nenhum campo para atualizar foi enviado.',
+        });
+      }
+  
+      // Confirmar a transação
+      await transaction.commit();
+  
       return response.status(200).json({
         sucesso: true,
         mensagem: `Ponto turístico ${ponto_id} atualizado com sucesso!`,
-        dados: result.rowsAffected,
       });
     } catch (error) {
+      console.error('Erro ao editar ponto turístico:', error);
+  
+      if (transaction) {
+        try {
+          await transaction.rollback();
+        } catch (rollbackError) {
+          console.error('Erro ao reverter transação:', rollbackError);
+        }
+      }
+  
       return response.status(500).json({
         sucesso: false,
         mensagem: 'Erro na requisição.',
-        dados: error.message,
+        detalhes: error.message,
       });
     } finally {
       if (pool) {
-        await closeConnection(pool);  // Garantir que a conexão seja fechada
+        await closeConnection(pool);
       }
     }
   },
+  
+  
+  
+  
+  
+  
+
+  
 
   // Apaga um ponto turístico
   async apagarPontoTuristico(request, response) {
@@ -236,6 +331,7 @@ async cadastrarPontoTuristico(request, response) {
       // Query para fazer JOIN nas tabelas pontos_turisticos, endereco e estados
       const query = `
         SELECT 
+          pt.ponto_id,  -- Adicionada a vírgula que estava faltando
           pt.nome, 
           pt.descricao, 
           pt.data_inclusao, 
@@ -301,6 +397,54 @@ async cadastrarPontoTuristico(request, response) {
   },
   
   
+  async apagarPontoTuristico(request, response) {
+    let pool;
+    try {
+      const { ponto_id } = request.params; // Obtendo o ponto_id da requisição
+      if (!ponto_id) {
+        return response.status(400).json({
+          sucesso: false,
+          mensagem: 'Ponto turístico ID é obrigatório.',
+        });
+      }
   
+      pool = await connect();  // Obtendo a conexão
+  
+      // Verificar se o ponto existe antes de tentar excluir
+      const checkQuery = 'SELECT COUNT(*) AS count FROM pontos_turisticos WHERE ponto_id = @ponto_id';
+      const checkResult = await pool.request()
+        .input('ponto_id', sql.Int, ponto_id)
+        .query(checkQuery);
+  
+      if (checkResult.recordset[0].count === 0) {
+        return response.status(404).json({
+          sucesso: false,
+          mensagem: `Ponto turístico ${ponto_id} não encontrado.`,
+        });
+      }
+  
+      // Query para excluir o ponto turístico
+      const deleteQuery = 'DELETE FROM pontos_turisticos WHERE ponto_id = @ponto_id';
+      const result = await pool.request()
+        .input('ponto_id', sql.Int, ponto_id)
+        .query(deleteQuery);
+  
+      return response.status(200).json({
+        sucesso: true,
+        mensagem: `Ponto turístico ${ponto_id} excluído com sucesso.`,
+        dados: result.rowsAffected,
+      });
+    } catch (error) {
+      return response.status(500).json({
+        sucesso: false,
+        mensagem: 'Erro na requisição.',
+        dados: error.message,
+      });
+    } finally {
+      if (pool) {
+        await closeConnection(pool);  // Garantir que a conexão seja fechada
+      }
+    }
+  }
   
 };
