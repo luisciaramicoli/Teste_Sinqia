@@ -8,7 +8,7 @@ const LoginController = require('../controllers/login');  // Verifique o caminho
 const EstadosController = require('../controllers/estados');  // Verifique o caminho correto
 // Listar todos os pontos turísticos
 router.get("/pontosTuristicos", TurismoController.listarPontosTuristicos);
-
+router.get("/listar", TurismoController.listarTudo);
 // Cadastrar um novo ponto turístico
 router.post("/cadastrarPonto", TurismoController.cadastrarPontoTuristico);
 
@@ -25,5 +25,6 @@ router.post("/cadastrarUsuario", CadastroController.cadastrarUsuario);
 router.post("/login", LoginController.login);
 
 router.get("/estados", EstadosController.listarEstados);
+router.get("/endereco", EstadosController.listarEndereco);
 
 module.exports = router;

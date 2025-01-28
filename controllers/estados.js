@@ -35,4 +35,52 @@ module.exports = {
       }
     }
   },
+
+  async listarEndereco(request, response) {
+    let pool;
+    try {
+      pool = await connect(); // Obtém a conexão
+  
+      // Consulta para incluir os dados do endereço e pontos turísticos
+      const result = await pool.request().query(`
+        SELECT * FROM endereco
+      `);
+  
+      const enderecos = result.recordset;
+      const nItens = enderecos.length;
+  
+      // Formatação dos dados de endereço, se necessário
+      const enderecosFormatados = enderecos.map((endereco) => {
+        return {
+          end_id: endereco.end_id,
+          logradouro: endereco.logradouro,
+          bairro: endereco.bairro,
+          cidade: endereco.cidade, // Cidade como VARCHAR
+          estado_id: endereco.estado_id,
+          cep: endereco.cep
+        };
+      });
+  
+      return response.status(200).json({
+        sucesso: true,
+        mensagem: 'Lista de Endereços.',
+        dados: enderecosFormatados,
+        nItens
+      });
+  
+    } catch (error) {
+      return response.status(500).json({
+        sucesso: false,
+        mensagem: 'Erro na requisição.',
+        dados: error.message,
+      });
+    } finally {
+      if (pool) {
+        await closeConnection(pool); // Garantir que a conexão seja fechada
+      }
+    }
+  }
+  
+  
+  
 };
