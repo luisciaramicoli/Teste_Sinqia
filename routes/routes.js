@@ -5,7 +5,7 @@ const router = express.Router();
 const TurismoController = require('../controllers/turismo');  // Verifique o caminho correto
 const CadastroController = require('../controllers/usuarios');  // Verifique o caminho correto
 const LoginController = require('../controllers/login');  // Verifique o caminho correto
-
+const EstadosController = require('../controllers/estados');  // Verifique o caminho correto
 // Listar todos os pontos turísticos
 router.get("/pontosTuristicos", TurismoController.listarPontosTuristicos);
 
@@ -23,5 +23,7 @@ router.post("/cadastrarUsuario", CadastroController.cadastrarUsuario);
 
 // Cadastrar um novo ponto usuario
 router.post("/login", LoginController.login);
+
+router.get("/estados", EstadosController.listarEstados);
 
 module.exports = router;
