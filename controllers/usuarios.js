@@ -25,7 +25,7 @@ module.exports = {
 
       // Consulta para inserir o novo usuário
       const query = `
-        INSERT INTO Usuarios (Nome, Email, Senha, Data_Nascimento, Data_Cadastro)
+        INSERT INTO Usuarios (nome, email, senha, data_nascimento, data_cadastro)
         OUTPUT INSERTED.usu_id
         VALUES (@nome, @email, @senha, @data_nascimento, GETDATE());
       `;
