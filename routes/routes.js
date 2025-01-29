@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-
+// isso aí
 // referência a controllers que serão utilizados nas rotas
 const TurismoController = require('../controllers/turismo');  // Verifique o caminho correto
 const CadastroController = require('../controllers/usuarios');  // Verifique o caminho correto
