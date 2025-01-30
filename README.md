@@ -33,14 +33,14 @@ Esta API faz o cadastro de usuários e pontos turísticos, além de editar e exc
 
 5. Execute o projeto:
    ```bash
-   npm start
+   npm run dev
    ```
 
 ## Como Usar
-
-1. Utilize ferramentas como Postman ou Insomnia para testar os endpoints.
-2. Certifique-se de que o banco de dados está corretamente configurado.
-3. Realize requisições para os endpoints conforme documentado na API.
+1. Abra o arquivo banco.txt e execute os comando no sql server.
+2. Utilize ferramentas como Postman ou Insomnia para testar os endpoints.
+3. Certifique-se de que o banco de dados está corretamente configurado.
+4. Realize requisições para os endpoints conforme documentado na API.
 
 ## Contribuição
 

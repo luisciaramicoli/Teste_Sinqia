@@ -1,0 +1,65 @@
+CREATE DATABASE pontos_turisticos_db
+
+use pontos_turisticos_db
+
+CREATE TABLE endereco (
+    end_id INT PRIMARY KEY IDENTITY(1,1),
+    logradouro VARCHAR(255) NOT NULL,
+    bairro VARCHAR(255),
+    cidade_id INT,
+    estado_id INT,
+    cep CHAR(8),
+    cidade VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE pontos_turisticos (
+    ponto_id INT PRIMARY KEY IDENTITY(1,1),
+    nome VARCHAR(255) NOT NULL,
+    descricao VARCHAR(100),
+    data_inclusao DATETIME DEFAULT GETDATE(),
+    end_id INT,
+    FOREIGN KEY (end_id) REFERENCES endereco(end_id)
+);
+
+CREATE TABLE usuarios (
+    usu_id INT PRIMARY KEY IDENTITY(1,1),
+    nome VARCHAR(255) NOT NULL,
+    email VARCHAR(100) UNIQUE,
+    senha VARCHAR(255) NOT NULL,
+    data_nascimento DATE,
+    data_cadastro DATETIME DEFAULT GETDATE()
+);
+
+CREATE TABLE Estados (
+    estado_id INT PRIMARY KEY IDENTITY(1,1),  -- ID único do estado
+    nome VARCHAR(255) NOT NULL,                -- Nome do estado
+    sigla CHAR(2) NOT NULL                    -- Sigla do estado (dois caracteres)
+);
+INSERT INTO Estados (nome, sigla) VALUES 
+('Acre', 'AC'),
+('Alagoas', 'AL'),
+('Amapá', 'AP'),
+('Amazonas', 'AM'),
+('Bahia', 'BA'),
+('Ceará', 'CE'),
+('Distrito Federal', 'DF'),
+('Espírito Santo', 'ES'),
+('Goiás', 'GO'),
+('Maranhão', 'MA'),
+('Mato Grosso', 'MT'),
+('Mato Grosso do Sul', 'MS'),
+('Minas Gerais', 'MG'),
+('Pará', 'PA'),
+('Paraíba', 'PB'),
+('Paraná', 'PR'),
+('Pernambuco', 'PE'),
+('Piauí', 'PI'),
+('Rio de Janeiro', 'RJ'),
+('Rio Grande do Norte', 'RN'),
+('Rio Grande do Sul', 'RS'),
+('Rondônia', 'RO'),
+('Roraima', 'RR'),
+('Santa Catarina', 'SC'),
+('São Paulo', 'SP'),
+('Sergipe', 'SE'),
+('Tocantins', 'TO');
