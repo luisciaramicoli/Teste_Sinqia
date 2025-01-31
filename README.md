@@ -1,6 +1,6 @@
 # API do CRUD
 
-Esta API faz o cadastro de usuários e pontos turísticos, além de editar e excluir.
+Esta API faz o cadastro de usuários e pontos turísticos, além de listar, editar e excluir.
 
 ## Funcionalidades
 
